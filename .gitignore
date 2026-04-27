@@ -1,0 +1,14 @@
+node_modules
+.nuxt
+.output
+dist
+coverage
+.turbo
+.playwright-mcp
+.pnpm-store
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+packages/db/src/generated

@@ -1,0 +1,30 @@
+{
+  "name": "@ps/admin",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "NUXT_TELEMETRY_DISABLED=1 nuxt dev --port 3001",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "echo \"tests not configured for @ps/admin yet\""
+  },
+  "dependencies": {
+    "@ps/data-access": "workspace:*",
+    "@ps/shared": "workspace:*",
+    "@ps/ui": "workspace:*",
+    "@tailwindcss/vite": "^4.2.4",
+    "lucide-vue-next": "^1.0.0",
+    "nuxt": "^4.4.2",
+    "tailwindcss": "^4.2.4",
+    "vue": "^3.5.33",
+    "vue-router": "^5.0.6"
+  },
+  "devDependencies": {
+    "@vue/language-core": "^3.2.7",
+    "vue-tsc": "^3.2.7"
+  }
+}

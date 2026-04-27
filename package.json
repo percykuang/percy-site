@@ -1,0 +1,77 @@
+{
+  "name": "percy-site",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.18.2",
+  "engines": {
+    "node": ">=22.12.0",
+    "pnpm": ">=10.18.2"
+  },
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:web": "turbo dev --filter=@ps/web",
+    "dev:admin": "turbo dev --filter=@ps/admin",
+    "build": "turbo build",
+    "build:web": "turbo build --filter=@ps/web",
+    "build:admin": "turbo build --filter=@ps/admin",
+    "lint": "turbo lint",
+    "lint:fix": "turbo lint:fix",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "stylelint": "stylelint \"**/*.{css,vue}\"",
+    "stylelint:fix": "stylelint \"**/*.{css,vue}\" --fix",
+    "spellcheck": "cspell --dot .",
+    "commitlint": "commitlint",
+    "check": "pnpm format:check && pnpm lint && pnpm stylelint && pnpm spellcheck && pnpm typecheck",
+    "prepare": "husky",
+    "db:generate": "pnpm --filter=@ps/db db:generate",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose stop postgres",
+    "db:migrate": "pnpm --filter=@ps/db db:migrate",
+    "db:deploy": "pnpm --filter=@ps/db db:deploy",
+    "db:studio": "pnpm --filter=@ps/db db:studio",
+    "db:seed": "pnpm --filter=@ps/db db:seed",
+    "docker:build:web": "docker build --build-arg APP=web -t percy-site-web .",
+    "docker:build:admin": "docker build --build-arg APP=admin -t percy-site-admin .",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down"
+  },
+  "lint-staged": {
+    "*.{ts,vue}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{css,md,json,yml,yaml}": [
+      "prettier --write"
+    ],
+    "*.{css,vue}": [
+      "stylelint --fix"
+    ],
+    "*": [
+      "cspell --no-progress"
+    ]
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.5.2",
+    "@commitlint/config-conventional": "^20.5.0",
+    "@eslint/js": "^10.0.1",
+    "cspell": "^9.6.0",
+    "eslint": "^10.2.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-vue": "^10.9.0",
+    "globals": "^17.5.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "postcss-html": "^1.8.1",
+    "prettier": "^3.8.3",
+    "prettier-plugin-tailwindcss": "^0.7.3",
+    "stylelint": "^17.9.0",
+    "stylelint-config-standard": "^40.0.0",
+    "stylelint-config-standard-vue": "^1.0.0",
+    "turbo": "^2.9.6",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.0"
+  }
+}

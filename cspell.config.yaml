@@ -1,0 +1,62 @@
+version: '0.2'
+language: en,zh-CN
+useGitignore: true
+ignorePaths:
+  - .git
+  - '**/.git'
+  - node_modules
+  - .nuxt
+  - '**/.nuxt'
+  - .output
+  - '**/.output'
+  - dist
+  - coverage
+  - .turbo
+  - .playwright-mcp
+  - .pnpm-store
+  - packages/db/src/generated
+  - pnpm-lock.yaml
+  - '*.log'
+words:
+  - admin
+  - bradlc
+  - composable
+  - composables
+  - commitlint
+  - cspell
+  - cuid
+  - dbaeumer
+  - datetime
+  - dotenv
+  - eslint
+  - esbenp
+  - fkey
+  - frontend
+  - healthcheck
+  - isready
+  - lucide
+  - mikestead
+  - monorepo
+  - nologin
+  - noninteractive
+  - Nuxt
+  - openapi
+  - percy
+  - pkey
+  - pnpm
+  - postgres
+  - PostgreSQL
+  - postcss
+  - Prettier
+  - Prisma
+  - shadcn
+  - sitemap
+  - stylelint
+  - tailwind
+  - tamasfe
+  - typecheck
+  - upsert
+  - vite
+  - vue
+  - webp
+  - zod

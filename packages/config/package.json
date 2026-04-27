@@ -1,0 +1,9 @@
+{
+  "name": "@ps/config",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./tsconfig/base": "./tsconfig/base.json",
+    "./tailwind/preset": "./tailwind/preset.ts"
+  }
+}

@@ -1,0 +1,34 @@
+:root {
+  --background: oklch(0.99 0.01 95);
+  --foreground: oklch(0.18 0.02 248);
+  --muted: oklch(0.95 0.01 250);
+  --muted-foreground: oklch(0.46 0.03 248);
+  --border: oklch(0.9 0.02 248);
+  --primary: oklch(0.52 0.12 198);
+  --primary-foreground: oklch(0.99 0.01 95);
+  --destructive: oklch(0.57 0.22 27);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: oklch(0.16 0.02 248);
+    --foreground: oklch(0.96 0.01 95);
+    --muted: oklch(0.22 0.02 248);
+    --muted-foreground: oklch(0.72 0.02 248);
+    --border: oklch(0.28 0.02 248);
+    --primary: oklch(0.72 0.12 198);
+    --primary-foreground: oklch(0.16 0.02 248);
+    --destructive: oklch(0.68 0.2 27);
+  }
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-destructive: var(--destructive);
+}
