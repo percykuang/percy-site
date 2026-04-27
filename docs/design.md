@@ -7,7 +7,8 @@ Percy Site 是一个面向前端开发者的个人主页系统，不只是静态
 项目目标：
 
 - 展示个人前端开发能力、工程化能力和产品审美。
-- 展示精选项目、技术文章、个人经历和联系方式。
+- 第一版前台保持极简，只展示个人介绍、技术文章和关于页。
+- 项目展示和联系表单暂不放入前台，后续内容成熟后再恢复。
 - 支持后台管理项目、文章、标签、站点配置和联系消息。
 - 通过 monorepo 架构沉淀公共组件、数据访问、类型定义和工程配置。
 - 使用现代 Vue 技术栈，体现 Vue 3、TypeScript、Nuxt、Tailwind CSS、Prisma 和 PostgreSQL 的综合实践能力。
@@ -130,13 +131,15 @@ percy-site/
 职责：
 
 - 首页展示。
-- 精选项目展示。
-- 项目列表和项目详情。
 - 博客文章列表和文章详情。
 - 关于我页面。
-- 联系入口和联系表单。
 - SEO、Open Graph、Sitemap、RSS。
-- 公开 API。
+- 公开文章 API。
+
+暂不包含：
+
+- 项目列表和项目详情。
+- 联系页和联系表单。
 
 建议目录：
 
@@ -146,17 +149,12 @@ apps/web/
     app.vue
     pages/
       index.vue
-      projects/
-        index.vue
-        [slug].vue
       blog/
         index.vue
         [slug].vue
       about.vue
-      contact.vue
     components/
       home/
-      projects/
       blog/
       layout/
     composables/
@@ -166,13 +164,9 @@ apps/web/
 
   server/
     api/
-      projects.get.ts
-      projects/
-        [slug].get.ts
       posts.get.ts
       posts/
         [slug].get.ts
-      contact.post.ts
     utils/
       seo.ts
 
@@ -667,19 +661,14 @@ admin.percy.dev 调用 percy.dev/api/admin
 
 - 你是谁。
 - 你擅长什么。
-- 你做过什么。
-- 你的技术审美和工程能力如何。
-- 如何联系你。
+- 你关注哪些前端主题。
+- 引导用户阅读文章或了解你。
 
 页面区块：
 
 ```txt
 Hero
-精选项目
-技术能力
 最近文章
-关于我预览
-联系入口
 ```
 
 Hero 内容：
@@ -695,14 +684,11 @@ Frontend Developer
 主要操作：
 
 ```txt
-查看项目
 阅读文章
-下载简历
-GitHub
-联系我
+关于我
 ```
 
-### 项目列表页
+### 项目列表页，后续恢复
 
 功能：
 
@@ -734,7 +720,7 @@ GitHub 链接
 详情入口
 ```
 
-### 项目详情页
+### 项目详情页，后续恢复
 
 页面结构：
 
@@ -824,7 +810,7 @@ Opinion
 相比堆叠视觉效果，我更重视真实用户流程、组件边界、性能和长期维护成本。
 ```
 
-### 联系页
+### 联系页，后续恢复
 
 功能：
 
@@ -1108,24 +1094,11 @@ updatedAt
 
 ### 7.1 web API
 
-公开项目：
-
-```txt
-GET /api/projects
-GET /api/projects/[slug]
-```
-
 公开文章：
 
 ```txt
 GET /api/posts
 GET /api/posts/[slug]
-```
-
-联系表单：
-
-```txt
-POST /api/contact
 ```
 
 站点配置：
@@ -1471,15 +1444,12 @@ web 应用需要支持：
 
 ```txt
 /
-/projects
-/projects/[slug]
 /blog
 /blog/[slug]
 /about
-/contact
 ```
 
-博客文章和项目详情页需要支持单独分享图。
+博客文章详情页需要支持单独分享图。
 
 第一版可以使用默认 OG 图，后续支持动态生成。
 
@@ -1516,8 +1486,7 @@ API schema 校验
 后台登录流程
 项目 CRUD 流程
 文章 CRUD 流程
-前台项目和文章展示
-联系表单提交
+前台文章展示
 ```
 
 推荐工具：
@@ -1579,12 +1548,9 @@ Prisma 可以连接数据库
 
 ```txt
 首页
-项目列表
-项目详情
 博客列表
 博客详情
 关于页
-联系页
 SEO 基础配置
 响应式适配
 ```

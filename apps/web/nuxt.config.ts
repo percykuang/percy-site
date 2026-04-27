@@ -3,8 +3,20 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineNuxtConfig({
   compatibilityDate: '2026-04-27',
   css: ['~/assets/css/main.css'],
+  app: {
+    head: {
+      title: "Percy's Site",
+      link: [
+        {
+          href: '/favicon.svg',
+          rel: 'icon',
+          type: 'image/svg+xml',
+        },
+      ],
+    },
+  },
   devtools: {
-    enabled: true,
+    enabled: process.env.NUXT_DEVTOOLS === 'true',
   },
   runtimeConfig: {
     sessionSecret: process.env.NUXT_SESSION_SECRET || '',

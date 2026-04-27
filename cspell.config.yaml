@@ -20,33 +20,40 @@ ignorePaths:
 words:
   - admin
   - bradlc
+  - commitlint
   - composable
   - composables
-  - commitlint
   - cspell
   - cuid
-  - dbaeumer
   - datetime
+  - dbaeumer
   - dotenv
-  - eslint
   - esbenp
+  - evenodd
+  - eslint
   - fkey
   - frontend
   - healthcheck
   - isready
+  - labelledby
+  - linecap
+  - linejoin
   - lucide
+  - Menlo
   - mikestead
   - monorepo
   - nologin
   - noninteractive
   - Nuxt
+  - oklch
   - openapi
+  - optimizelegibility
   - percy
   - pkey
   - pnpm
+  - postcss
   - postgres
   - PostgreSQL
-  - postcss
   - Prettier
   - Prisma
   - shadcn
