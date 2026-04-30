@@ -50,10 +50,13 @@ services:
       NUXT_SESSION_SECRET: ${NUXT_SESSION_SECRET:-change-me}
       NUXT_PUBLIC_SITE_URL: ${NUXT_PUBLIC_SITE_URL:-http://localhost:3000}
       NUXT_PUBLIC_ADMIN_URL: ${NUXT_PUBLIC_ADMIN_URL:-http://localhost:3001}
+      NUXT_UPLOADS_DIR: ${NUXT_UPLOADS_DIR:-/app/storage/uploads}
       HOST: 0.0.0.0
       PORT: 3000
     ports:
       - '${WEB_PORT:-3000}:3000'
+    volumes:
+      - uploads-data:/app/storage/uploads
     restart: unless-stopped
 
   admin:
@@ -74,13 +77,17 @@ services:
       NUXT_SESSION_SECRET: ${NUXT_SESSION_SECRET:-change-me}
       NUXT_PUBLIC_SITE_URL: ${NUXT_PUBLIC_SITE_URL:-http://localhost:3000}
       NUXT_PUBLIC_ADMIN_URL: ${NUXT_PUBLIC_ADMIN_URL:-http://localhost:3001}
+      NUXT_UPLOADS_DIR: ${NUXT_UPLOADS_DIR:-/app/storage/uploads}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@example.com}
       ADMIN_INITIAL_PASSWORD: ${ADMIN_INITIAL_PASSWORD:-change-me}
       HOST: 0.0.0.0
       PORT: 3000
     ports:
       - '${ADMIN_PORT:-3001}:3000'
+    volumes:
+      - uploads-data:/app/storage/uploads
     restart: unless-stopped
 
 volumes:
   postgres-data:
+  uploads-data:

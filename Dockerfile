@@ -70,6 +70,8 @@ WORKDIR /app
 
 RUN groupadd --gid 1001 nodejs \
   && useradd --uid 1001 --gid nodejs --create-home --shell /usr/sbin/nologin nuxt
+RUN mkdir -p /app/storage/uploads \
+  && chown -R nuxt:nodejs /app/storage
 
 COPY --from=builder --chown=nuxt:nodejs /app/apps/${APP}/.output ./.output
 
