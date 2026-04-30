@@ -7,7 +7,7 @@
           你好，我是 Percy。
         </h1>
         <p class="text-muted-foreground mt-6 max-w-3xl text-lg leading-8">
-          我喜欢极简的设计哲学，也喜欢把界面当作系统来设计，在像素、状态、类型和数据流之间反复调试，构建干净、可靠、可长期运行的
+          我喜欢极简的设计哲学，也喜欢把界面当作系统来设计，从信息结构、交互状态、视觉细节到工程实现，构建干净、可靠、可长期运行的
           Web 体验。现在也在探索 AI 应用开发，把模型能力、产品交互和工程落地连接起来。
         </p>
 
@@ -45,5 +45,5 @@
 <script setup lang="ts">
 import { ArrowRight, BookOpen } from 'lucide-vue-next'
 
-const introTags = ['AI Product Builder', 'Minimal UI', 'Typed UI', 'Clean Systems']
+const introTags = ['Minimal Design', 'Clear Interfaces', 'Reliable Systems', 'Product Thinking']
 </script>

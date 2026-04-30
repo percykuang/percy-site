@@ -5,12 +5,12 @@
       class="ps-image-lightbox"
       role="dialog"
       aria-modal="true"
-      @click.self="close"
+      @click="close"
     >
       <div class="ps-image-lightbox__viewport">
         <div class="ps-image-lightbox__stage">
           <figure class="ps-image-lightbox__figure">
-            <img :src="src" :alt="alt" class="ps-image-lightbox__image" @click="close" />
+            <img :src="src" :alt="alt" class="ps-image-lightbox__image" @click.stop="close" />
           </figure>
         </div>
       </div>
