@@ -131,7 +131,6 @@ packages/
   data-access/  # 共享数据访问逻辑
   shared/       # 类型、Zod schema、常量、纯工具函数
   ui/           # 公共 Vue 组件
-  config/       # 共享工程配置
 
 docs/
   design.md     # 项目完整设计稿
@@ -175,8 +174,8 @@ web API 示例：
 ```txt
 GET  /api/projects
 GET  /api/projects/[slug]
-GET  /api/posts
-GET  /api/posts/[slug]
+GET  /api/articles
+GET  /api/articles/[id]
 POST /api/contact
 ```
 
@@ -194,14 +193,12 @@ web 不负责：
 职责：
 
 - 登录。
-- Dashboard。
-- 项目管理。
 - 文章管理。
-- 标签管理。
 - 媒体管理。
-- 联系消息管理。
 - 站点配置。
 - 后台 API。
+
+当前第一版 admin 不提供项目管理、联系消息管理和独立标签管理页面；标签仍作为文章元数据在文章编辑表单中维护。相关数据模型与 data-access 可保留，等后续需求恢复时再接入页面和 API。
 
 admin API 示例：
 
@@ -209,14 +206,12 @@ admin API 示例：
 POST   /api/auth/login
 POST   /api/auth/logout
 GET    /api/auth/me
-GET    /api/projects
-POST   /api/projects
-PATCH  /api/projects/[id]
-DELETE /api/projects/[id]
-GET    /api/posts
-POST   /api/posts
-PATCH  /api/posts/[id]
-DELETE /api/posts/[id]
+GET    /api/articles
+POST   /api/articles
+PATCH  /api/articles/[id]
+DELETE /api/articles/[id]
+GET    /api/tags
+GET    /api/settings
 ```
 
 admin 不承载公开展示页面。
@@ -245,12 +240,14 @@ admin 不承载公开展示页面。
 - `createProject`
 - `updateProject`
 - `deleteProject`
-- posts、tags、messages、settings 等同理。
+- articles、tags、messages、settings 等同理。
 
 原则：
 
 - Nuxt `server/api` 路由层保持薄。
 - 复杂 Prisma 查询和复用逻辑放在 data-access。
+- 根入口 `@ps/data-access` 只暴露当前 web/admin 正在使用的稳定领域 API。
+- 预留但尚未接入产品面的领域能力，应通过显式次级入口暴露，避免污染当前公共导出面。
 - data-access 只能在服务端代码中使用。
 - 客户端 Vue 组件不要直接引入 data-access。
 
@@ -308,18 +305,6 @@ shared 不应该依赖：
 先在 app 内实现，确认 web 和 admin 都需要后，再抽到 packages/ui。
 ```
 
-### packages/config
-
-放共享工程配置：
-
-- TypeScript 配置。
-- ESLint 配置。
-- Prettier 配置。
-- Tailwind preset。
-- 测试配置，可选。
-
-不要为了抽象而抽象。第一版可以简单，等重复配置变多后再沉淀。
-
 ## 依赖方向
 
 必须保持单向依赖：
@@ -340,7 +325,6 @@ packages/ui -> packages/shared，可选
 
 packages/db -> 不依赖 apps
 packages/shared -> 不依赖 apps
-packages/config -> 不依赖 apps
 ```
 
 禁止：
@@ -477,8 +461,8 @@ Tailwind 规则：
 /
 /projects
 /projects/[slug]
-/blog
-/blog/[slug]
+/articles
+/articles/[id]
 /about
 /contact
 ```
@@ -645,7 +629,7 @@ export default defineEventHandler(async (event) => {
 - 公开查询必须过滤 `published: true`。
 - 查询列表时应显式指定排序。
 - 返回给客户端的数据应只选择需要字段，避免暴露内部字段。
-- 写操作函数命名使用动词开头，例如 `createProject`、`updatePost`、`deleteTag`。
+- 写操作函数命名使用动词开头，例如 `createProject`、`updateArticle`、`deleteTag`。
 - 多步骤写入需要考虑事务，必要时使用 `prisma.$transaction`。
 - 捕获数据库错误时不要吞掉异常，应转换为明确业务错误或继续抛出。
 
@@ -654,8 +638,8 @@ export default defineEventHandler(async (event) => {
 - Vue 组件文件使用 PascalCase：`ProjectCard.vue`。
 - composable 使用 camelCase，并以 `use` 开头：`useTheme.ts`。
 - 普通工具文件使用 kebab-case 或领域名：`date.ts`、`slug.ts`、`api-response.ts`。
-- schema 文件按领域命名：`project.ts`、`post.ts`、`auth.ts`。
-- data-access 文件按领域命名：`projects.ts`、`posts.ts`、`messages.ts`。
+- schema 文件按领域命名：`project.ts`、`article.ts`、`auth.ts`。
+- data-access 文件按领域命名：`projects.ts`、`articles.ts`、`messages.ts`。
 - API 路由遵循 Nuxt 文件路由约定：`index.get.ts`、`[id].patch.ts`。
 - 测试文件与被测文件相邻或放在统一测试目录，命名为 `*.test.ts` 或 `*.spec.ts`。
 
@@ -689,8 +673,8 @@ export default defineEventHandler(async (event) => {
 - seed 数据应保持可重复执行。
 - 公开查询必须过滤 `published: true`。
 - 删除操作优先考虑业务影响，必要时使用软删除。
-- slug 必须唯一。
-- 文章和项目的发布时间应与发布状态保持一致。
+- 项目 slug 必须唯一；文章公开访问使用服务端生成的 `id`。
+- 需要发布状态的模型，其发布时间应与发布状态保持一致。
 
 ## 环境变量规范
 
@@ -768,9 +752,11 @@ ADMIN_INITIAL_PASSWORD="change-me"
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose stop postgres",
     "db:migrate": "pnpm --filter=@ps/db db:migrate",
-    "db:deploy": "pnpm --filter=@ps/db db:deploy",
+    "db:deploy": "docker compose run --build --rm migrate",
+    "db:deploy:local": "pnpm --filter=@ps/db db:deploy",
     "db:studio": "pnpm --filter=@ps/db db:studio",
-    "db:seed": "pnpm --filter=@ps/db db:seed"
+    "db:seed": "docker compose run --build --rm migrate pnpm --filter @ps/db db:seed",
+    "db:seed:local": "pnpm --filter=@ps/db db:seed"
   }
 }
 ```
@@ -847,7 +833,6 @@ packages/
   data-access/
   shared/
   ui/
-  config/
 ```
 
 当前不推荐新增：

@@ -7,10 +7,10 @@ Percy Site 是一个面向前端开发者的个人主页系统，不只是静态
 项目目标：
 
 - 展示个人前端开发能力、工程化能力和产品审美。
-- 第一版前台保持极简，只展示个人介绍、技术文章和关于页。
+- 第一版前台保持极简，只展示个人介绍、技术文章、分类页和关于页。
 - 项目展示和联系表单暂不放入前台，后续内容成熟后再恢复。
-- 支持后台管理项目、文章、标签、站点配置和联系消息。
-- 通过 monorepo 架构沉淀公共组件、数据访问、类型定义和工程配置。
+- 第一版后台聚焦文章管理；分类和标签作为文章元数据能力提供，不提供独立标签管理页。项目管理、联系消息管理和站点设置页暂不接入后台。
+- 通过 monorepo 架构沉淀公共组件、数据访问和类型定义。
 - 使用现代 Vue 技术栈，体现 Vue 3、TypeScript、Nuxt、Tailwind CSS、Prisma 和 PostgreSQL 的综合实践能力。
 
 核心访问入口：
@@ -49,8 +49,8 @@ admin.percy.dev    # 管理后台
 语言：TypeScript
 视图：Vue 3
 样式：Tailwind CSS
-组件：shadcn-vue
-图标：lucide-vue-next
+组件：Ant Design Vue
+图标：@ant-design/icons-vue
 部署：admin 子域名
 ```
 
@@ -111,7 +111,6 @@ percy-site/
     data-access/
     shared/
     ui/
-    config/
 
   docs/
     design.md
@@ -131,7 +130,8 @@ percy-site/
 职责：
 
 - 首页展示。
-- 博客文章列表和文章详情。
+- 文章列表和文章详情。
+- 分类页。
 - 关于我页面。
 - SEO、Open Graph、Sitemap、RSS。
 - 公开文章 API。
@@ -149,26 +149,28 @@ apps/web/
     app.vue
     pages/
       index.vue
-      blog/
+      articles/
         index.vue
-        [slug].vue
+        [id].vue
+      categories/
+        index.vue
       about.vue
     components/
-      home/
-      blog/
       layout/
     composables/
+    plugins/
     assets/
       css/
         main.css
 
   server/
     api/
-      posts.get.ts
-      posts/
-        [slug].get.ts
+      articles.get.ts
+      articles/
+        [id].get.ts
     utils/
-      seo.ts
+      api.ts
+      markdown.ts
 
   public/
     images/
@@ -185,13 +187,8 @@ apps/web/
 职责：
 
 - 管理员登录。
-- Dashboard。
-- 项目 CRUD。
 - 文章 CRUD。
-- 标签管理。
-- 媒体管理。
-- 联系消息管理。
-- 站点配置。
+- 分类与标签支撑接口。
 - 后台 API。
 
 建议目录：
@@ -203,29 +200,17 @@ apps/admin/
     pages/
       login.vue
       index.vue
-      projects/
+      articles/
         index.vue
         [id].vue
         new.vue
-      posts/
-        index.vue
-        [id].vue
-        new.vue
-      tags/
-        index.vue
-      messages/
-        index.vue
-      settings.vue
     layouts/
       default.vue
       auth.vue
     components/
-      dashboard/
-      projects/
-      posts/
-      layout/
+      articles/
     middleware/
-      auth.ts
+      auth.global.ts
     composables/
 
   server/
@@ -234,13 +219,7 @@ apps/admin/
         login.post.ts
         logout.post.ts
         me.get.ts
-      projects/
-        index.get.ts
-        index.post.ts
-        [id].get.ts
-        [id].patch.ts
-        [id].delete.ts
-      posts/
+      articles/
         index.get.ts
         index.post.ts
         [id].get.ts
@@ -249,19 +228,17 @@ apps/admin/
       tags/
         index.get.ts
         index.post.ts
-        [id].patch.ts
         [id].delete.ts
-      messages/
+      categories/
         index.get.ts
-        [id].patch.ts
+        index.post.ts
+        [id].delete.ts
       settings/
         index.get.ts
-        index.patch.ts
-    middleware/
-      auth.ts
     utils/
       require-auth.ts
-      session.ts
+      admin-session.ts
+      api.ts
 
   public/
   nuxt.config.ts
@@ -323,26 +300,19 @@ if (process.env.NODE_ENV !== 'production') {
 
 职责：
 
-- 查询公开项目。
-- 查询后台项目列表。
-- 创建、更新、删除项目。
 - 查询公开文章。
 - 查询后台文章列表。
 - 创建、更新、删除文章。
-- 管理联系消息。
-- 管理站点配置。
 
 建议目录：
 
 ```txt
 packages/data-access/
   src/
-    projects.ts
-    posts.ts
+    articles.ts
+    auth.ts
+    categories.ts
     tags.ts
-    messages.ts
-    site.ts
-    users.ts
     index.ts
 
   package.json
@@ -352,124 +322,46 @@ packages/data-access/
 
 - `apps/web` 和 `apps/admin` 的 API 路由尽量保持薄。
 - 复杂 Prisma 查询放在 `data-access`。
+- 根入口 `@ps/data-access` 只暴露当前活跃领域。
+- 不为未来预留无消费者的数据访问壳层。
 - 业务校验输入优先使用 `packages/shared` 中的 Zod schema。
 - 不在客户端组件中直接引入 `data-access`。
 
-示例：
-
-```ts
-// packages/data-access/src/projects.ts
-import { prisma } from '@ps/db'
-import type { CreateProjectInput, UpdateProjectInput } from '@ps/shared'
-
-export function listPublishedProjects() {
-  return prisma.project.findMany({
-    where: {
-      published: true,
-    },
-    orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
-  })
-}
-
-export function getPublishedProjectBySlug(slug: string) {
-  return prisma.project.findFirst({
-    where: {
-      slug,
-      published: true,
-    },
-  })
-}
-
-export function listAdminProjects() {
-  return prisma.project.findMany({
-    orderBy: {
-      createdAt: 'desc',
-    },
-  })
-}
-
-export function createProject(input: CreateProjectInput) {
-  return prisma.project.create({
-    data: input,
-  })
-}
-
-export function updateProject(id: string, input: UpdateProjectInput) {
-  return prisma.project.update({
-    where: {
-      id,
-    },
-    data: input,
-  })
-}
-```
-
 ### 3.5 packages/shared
 
-`packages/shared` 存放前后端共享的类型、schema、常量和纯工具函数。
+`packages/shared` 存放前后端共享的 schema、类型和纯工具函数。
 
 职责：
 
 - Zod schema。
 - TypeScript 类型。
-- 枚举。
-- 常量。
 - API 响应类型。
-- 路由常量。
-- 日期、slug、字符串等纯工具函数。
+- slug、id、字数统计等纯工具函数。
 
 建议目录：
 
 ```txt
 packages/shared/
   src/
+    api.ts
+    article.ts
+    auth.ts
+    category.ts
+    pagination.ts
+    tag.ts
+    utils.ts
     schemas/
-      auth.ts
-      project.ts
-      post.ts
-      tag.ts
-      contact.ts
-      site.ts
     types/
-      api.ts
-      project.ts
-      post.ts
-      user.ts
-    constants/
-      routes.ts
-      site.ts
     utils/
-      date.ts
-      slug.ts
-      text.ts
-    index.ts
 
   package.json
 ```
 
-示例：
+当前约束：
 
-```ts
-// packages/shared/src/schemas/project.ts
-import { z } from 'zod'
-
-export const createProjectSchema = z.object({
-  title: z.string().min(1),
-  slug: z.string().min(1),
-  summary: z.string().min(1),
-  content: z.string().min(1),
-  coverImage: z.string().url().optional(),
-  demoUrl: z.string().url().optional(),
-  repoUrl: z.string().url().optional(),
-  featured: z.boolean().default(false),
-  published: z.boolean().default(false),
-})
-
-export const updateProjectSchema = createProjectSchema.partial()
-
-export type CreateProjectInput = z.infer<typeof createProjectSchema>
-export type UpdateProjectInput = z.infer<typeof updateProjectSchema>
-```
+- `@ps/shared` 根入口只保留横切能力，例如 `api` 与 `utils`
+- 具体领域对象按子路径导入，例如 `@ps/shared/article`
+- 不为未来预留无消费者的 schema 入口
 
 ### 3.6 packages/ui
 
@@ -539,39 +431,6 @@ packages/ui/
   package.json
 ```
 
-### 3.7 packages/config
-
-`packages/config` 存放共享工程配置。
-
-职责：
-
-- TypeScript 配置。
-- ESLint 配置。
-- Prettier 配置。
-- Tailwind preset。
-- Vitest / Playwright 共享配置，可选。
-
-第一版可以简单处理，后续随着项目稳定再逐步抽象。
-
-建议目录：
-
-```txt
-packages/config/
-  tsconfig/
-    base.json
-    nuxt.json
-    package.json
-  eslint/
-    index.js
-    package.json
-  tailwind/
-    preset.ts
-    package.json
-  prettier/
-    index.js
-    package.json
-```
-
 ## 4. 应用边界
 
 ### 4.1 web 边界
@@ -582,7 +441,7 @@ web 只处理公开访问相关能力：
 公开页面
 公开内容查询
 SEO
-联系表单
+分类页
 站点地图
 RSS
 Open Graph
@@ -604,12 +463,8 @@ admin 只处理后台管理：
 ```txt
 登录
 鉴权
-项目管理
 文章管理
-标签管理
-联系消息管理
-站点设置
-后台统计
+分类与标签支撑接口
 ```
 
 admin 不直接承载公开展示页面。
@@ -619,11 +474,8 @@ admin 不直接承载公开展示页面。
 web API：
 
 ```txt
-percy.dev/api/projects
-percy.dev/api/projects/[slug]
-percy.dev/api/posts
-percy.dev/api/posts/[slug]
-percy.dev/api/contact
+percy.dev/api/articles
+percy.dev/api/articles/[id]
 ```
 
 admin API：
@@ -632,11 +484,9 @@ admin API：
 admin.percy.dev/api/auth/login
 admin.percy.dev/api/auth/logout
 admin.percy.dev/api/auth/me
-admin.percy.dev/api/projects
-admin.percy.dev/api/posts
+admin.percy.dev/api/articles
+admin.percy.dev/api/categories
 admin.percy.dev/api/tags
-admin.percy.dev/api/messages
-admin.percy.dev/api/settings
 ```
 
 web 调用 web 自己的 API。
@@ -749,45 +599,39 @@ GitHub 链接
 使用 Nuxt server routes 简化数据提交
 ```
 
-### 博客列表页
+### 文章列表页
 
 功能：
 
 - 展示文章列表。
-- 支持标签筛选。
-- 支持搜索，后续实现。
-- 展示发布时间和阅读时间。
+- 当前为时间序展示。
+- 展示发布时间和文章字数。
 
-文章类型：
-
-```txt
-Notes
-Deep Dive
-Case Study
-Snippet
-Opinion
-```
-
-### 博客详情页
+### 文章详情页
 
 功能：
 
-- Markdown / 富文本展示。
+- Markdown 展示。
 - 代码高亮。
-- 目录导航。
-- 阅读时间。
-- 上一篇 / 下一篇。
+- 代码块复制和下载。
+- 文章字数。
 - Open Graph。
 
-排版要求：
+当前实现约束：
 
 ```txt
-正文宽度控制在 720px 左右
-标题层级清晰
-代码块可读
-移动端阅读体验良好
-深色模式可读性良好
+Markdown 在服务端渲染为 HTML
+代码高亮由 Shiki 生成
+客户端只负责增强交互和样式呈现
 ```
+
+### 分类页
+
+功能：
+
+- 按分类聚合展示文章。
+- 展示每个分类下的文章数量。
+- 从分类页进入文章详情时保留返回语义。
 
 ### 关于页
 
@@ -838,7 +682,7 @@ Opinion
 - 邮箱 / 用户名登录。
 - 密码输入。
 - 登录错误提示。
-- 登录成功后跳转 Dashboard。
+- 登录成功后跳转文章管理页。
 
 安全要求：
 
@@ -847,45 +691,12 @@ Opinion
 - 密码使用哈希存储。
 - 登录接口限流，后续实现。
 
-### Dashboard
+### 后台入口
 
 展示：
 
-- 项目数量。
-- 文章数量。
-- 未读联系消息。
-- 最近发布内容。
-- 最近联系消息。
-- 快捷入口。
-
-### 项目管理
-
-功能：
-
-- 项目列表。
-- 新建项目。
-- 编辑项目。
-- 删除项目。
-- 发布 / 下线。
-- 设置精选。
-- 配置封面、技术栈、链接。
-
-字段：
-
-```txt
-标题
-Slug
-摘要
-内容
-封面
-技术栈
-分类
-Demo 链接
-GitHub 链接
-是否精选
-是否发布
-发布时间
-```
+- 登录后默认进入文章管理页。
+- `/` 作为后台入口路径，自动跳转到 `/articles`。
 
 ### 文章管理
 
@@ -895,51 +706,28 @@ GitHub 链接
 - 新建文章。
 - 编辑文章。
 - 删除文章。
-- 发布 / 下线。
-- 标签管理。
-- 摘要和封面设置。
+- 发布日期设置。
+- 分类单选，支持从数据库选项中选择、临时创建和删除。
+- 标签多选，支持从数据库选项中选择、临时创建和删除。
 
 字段：
 
 ```txt
 标题
-Slug
 摘要
 内容
-封面
+分类
 标签
-是否发布
-发布时间
+发布日期
 ```
 
-### 标签管理
+### 分类管理
 
 功能：
 
-- 新建标签。
-- 编辑标签。
-- 删除标签。
-- 查看关联文章 / 项目数量。
-
-### 联系消息管理
-
-功能：
-
-- 查看联系表单消息。
-- 标记已读。
-- 删除消息。
-- 按时间排序。
-
-### 站点设置
-
-功能：
-
-- 站点标题。
-- 站点描述。
-- 个人介绍。
-- 社交链接。
-- 简历链接。
-- SEO 默认配置。
+- 当前不提供独立分类管理页面。
+- 分类在文章编辑流程中按需输入、选择和删除。
+- 标签同样不提供独立页面，作为文章元数据能力存在。
 
 ## 6. 数据模型设计
 
@@ -948,7 +736,7 @@ Slug
 ```txt
 User
 Project
-Post
+Article
 Tag
 Asset
 ContactMessage
@@ -1000,7 +788,7 @@ updatedAt
 - `techStack` 可以第一版使用 JSON 字段。
 - 后续如果需要更复杂筛选，可以拆为 ProjectTech 表。
 
-### 6.3 Post
+### 6.3 Article
 
 用途：博客文章。
 
@@ -1010,16 +798,39 @@ updatedAt
 id
 title
 slug
+category
 excerpt
 content
 coverImage
+wordCount
 published
 publishedAt
 createdAt
 updatedAt
 ```
 
-### 6.4 Tag
+说明：
+
+- `category` 用于文章列表和详情页展示文章方向，例如前端工程、AI 应用、产品界面。
+- 后台维护独立的 Category 字典表，文章保存时会同步创建或复用分类选项。
+- `wordCount` 存储文章总字数，创建或更新文章时由服务端根据正文计算。
+- 第一版 seed 会写入一组公开文章数据，前台通过公开文章 API 获取；后续后台发布流程完善后再移除 seed 模拟内容。
+
+### 6.4 Category
+
+用途：后台文章分类选项。
+
+字段：
+
+```txt
+id
+name
+slug
+createdAt
+updatedAt
+```
+
+### 6.5 Tag
 
 用途：文章和项目标签。
 
@@ -1036,11 +847,11 @@ updatedAt
 关系：
 
 ```txt
-Post <-> Tag
+Article <-> Tag
 Project <-> Tag
 ```
 
-### 6.5 Asset
+### 6.6 Asset
 
 用途：媒体资源。
 
@@ -1097,14 +908,8 @@ updatedAt
 公开文章：
 
 ```txt
-GET /api/posts
-GET /api/posts/[slug]
-```
-
-站点配置：
-
-```txt
-GET /api/site
+GET /api/articles
+GET /api/articles/[id]
 ```
 
 ### 7.2 admin API
@@ -1117,47 +922,25 @@ POST /api/auth/logout
 GET  /api/auth/me
 ```
 
-项目：
-
-```txt
-GET    /api/projects
-POST   /api/projects
-GET    /api/projects/[id]
-PATCH  /api/projects/[id]
-DELETE /api/projects/[id]
-```
-
 文章：
 
 ```txt
-GET    /api/posts
-POST   /api/posts
-GET    /api/posts/[id]
-PATCH  /api/posts/[id]
-DELETE /api/posts/[id]
+GET    /api/articles
+POST   /api/articles
+GET    /api/articles/[id]
+PATCH  /api/articles/[id]
+DELETE /api/articles/[id]
 ```
 
-标签：
+分类与标签支撑：
 
 ```txt
+GET    /api/categories
+POST   /api/categories
+DELETE /api/categories/[id]
 GET    /api/tags
 POST   /api/tags
-PATCH  /api/tags/[id]
 DELETE /api/tags/[id]
-```
-
-联系消息：
-
-```txt
-GET   /api/messages
-PATCH /api/messages/[id]
-```
-
-站点设置：
-
-```txt
-GET   /api/settings
-PATCH /api/settings
 ```
 
 ## 8. 鉴权设计
@@ -1202,7 +985,7 @@ SameSite: Lax
 3. server/api/auth/login 校验密码
 4. 创建 session
 5. 设置 HttpOnly Cookie
-6. 跳转 Dashboard
+6. 跳转文章管理页
 ```
 
 鉴权流程：
@@ -1238,9 +1021,9 @@ SameSite: Lax
 字体建议：
 
 ```txt
-中文：system-ui / PingFang SC / Microsoft YaHei
-英文：Inter / Geist / system-ui
-代码：JetBrains Mono / Geist Mono / ui-monospace
+正文：Segoe UI / PingFang SC / Hiragino Sans GB / sans-serif
+后台正文：Segoe UI / PingFang SC / Hiragino Sans GB / Microsoft YaHei / sans-serif
+代码：ui-monospace / SFMono-Regular / Menlo / Monaco / Consolas / Liberation Mono / Courier New
 ```
 
 颜色建议：
@@ -1343,8 +1126,11 @@ SESSION_SECRET 必须使用强随机值
     "format": "prettier --write .",
     "db:generate": "pnpm --filter=@ps/db db:generate",
     "db:migrate": "pnpm --filter=@ps/db db:migrate",
+    "db:deploy": "docker compose run --build --rm migrate",
+    "db:deploy:local": "pnpm --filter=@ps/db db:deploy",
     "db:studio": "pnpm --filter=@ps/db db:studio",
-    "db:seed": "pnpm --filter=@ps/db db:seed"
+    "db:seed": "docker compose run --build --rm migrate pnpm --filter @ps/db db:seed",
+    "db:seed:local": "pnpm --filter=@ps/db db:seed"
   }
 }
 ```
@@ -1358,7 +1144,6 @@ SESSION_SECRET 必须使用强随机值
 @ps/data-access
 @ps/shared
 @ps/ui
-@ps/config
 ```
 
 `pnpm-workspace.yaml`：
@@ -1444,12 +1229,12 @@ web 应用需要支持：
 
 ```txt
 /
-/blog
-/blog/[slug]
+/articles
+/articles/[id]
 /about
 ```
 
-博客文章详情页需要支持单独分享图。
+文章详情页需要支持单独分享图。
 
 第一版可以使用默认 OG 图，后续支持动态生成。
 
@@ -1484,7 +1269,6 @@ web 应用需要支持：
 核心工具函数单元测试
 API schema 校验
 后台登录流程
-项目 CRUD 流程
 文章 CRUD 流程
 前台文章展示
 ```
@@ -1569,11 +1353,7 @@ percy.dev 可以上线展示
 
 ```txt
 登录
-Dashboard
-项目 CRUD
 文章 CRUD
-标签管理
-联系消息查看
 ```
 
 交付：
@@ -1631,7 +1411,6 @@ packages/
   data-access/  # 共享数据访问逻辑
   shared/       # 类型、Zod schema、常量、工具
   ui/           # 公共 Vue 组件
-  config/       # 共享工程配置
 ```
 
 最终技术栈：

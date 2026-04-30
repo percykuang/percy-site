@@ -16,7 +16,6 @@ packages/
   data-access  # 共享数据访问逻辑
   shared       # 类型、Zod schema、常量、工具
   ui           # 公共 Vue 组件
-  config       # 共享工程配置
 ```
 
 ## 常用命令
@@ -63,6 +62,11 @@ pnpm db:seed
 pnpm dev:web
 pnpm dev:admin
 ```
+
+说明：
+
+- `pnpm db:deploy` 和 `pnpm db:seed` 默认通过 Docker `migrate` 服务执行，并在运行前自动重建镜像，避免本机 Node/Prisma 环境差异或旧镜像影响迁移结果。
+- 需要直接在本机执行 Prisma 命令时，可使用 `pnpm db:deploy:local` 和 `pnpm db:seed:local`。
 
 质量检查约定：
 
