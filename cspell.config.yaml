@@ -23,6 +23,9 @@ words:
   - antd
   - anticon
   - bradlc
+  - Buildx
+  - Caddy
+  - Caddyfile
   - commitlint
   - composable
   - composables
@@ -38,6 +41,7 @@ words:
   - fkey
   - flac
   - frontend
+  - ghcr
   - healthcheck
   - Hiragino
   - isready
@@ -67,6 +71,7 @@ words:
   - Prettier
   - Prisma
   - quicktime
+  - rollback
   - Segoe
   - shadcn
   - Shiki
@@ -82,3 +87,4 @@ words:
   - vueform
   - webp
   - zod
+  - zstd

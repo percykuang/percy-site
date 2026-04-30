@@ -2,7 +2,8 @@
 
 Percy Site 是一个基于 Nuxt、Vue 3、TypeScript、Tailwind CSS、Prisma 和 PostgreSQL 的个人主页与后台管理系统。
 
-完整设计见 [docs/design.md](docs/design.md)，项目协作约定见 [AGENTS.md](AGENTS.md)。
+完整设计见 [docs/design.md](docs/design.md)，生产部署见
+[docs/deployment-runbook.md](docs/deployment-runbook.md)，项目协作约定见 [AGENTS.md](AGENTS.md)。
 
 ## 目录
 
@@ -158,3 +159,14 @@ pnpm docker:down
 ```
 
 注意：生产环境必须替换 `.env` 中的 `POSTGRES_PASSWORD`、`DATABASE_URL`、`NUXT_SESSION_SECRET`、`ADMIN_INITIAL_PASSWORD` 等敏感配置。
+
+## 生产部署
+
+生产环境采用 Docker 镜像 + Docker Compose + 服务器级 Caddy 入口代理：
+
+- `https://percy.ren` 指向 `apps/web`。
+- `https://admin.percy.ren` 指向 `apps/admin`。
+- Percy Site 的生产 compose 不直接绑定 `80` / `443`，而是通过外部 Docker 网络 `edge` 接入统一入口代理。
+- GitHub Actions `Deploy` workflow 会构建 `percy-site-web`、`percy-site-admin`、`percy-site-migrate` 三个镜像，并通过 SSH 触发服务器部署。
+
+完整上线步骤、服务器 `.env.prod`、Caddy 配置和回滚命令见 [docs/deployment-runbook.md](docs/deployment-runbook.md)。

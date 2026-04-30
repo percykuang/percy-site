@@ -1,0 +1,92 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    image: ${IMAGE_NAMESPACE}/percy-site-migrate:${IMAGE_TAG:-main-latest}
+    restart: 'no'
+    env_file:
+      - .env.prod
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    image: ${IMAGE_NAMESPACE}/percy-site-web:${IMAGE_TAG:-main-latest}
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - '3000'
+    volumes:
+      - uploads_data:/app/storage/uploads
+    networks:
+      default:
+      edge:
+        aliases:
+          - percy-web
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/api/health').then((response)=>process.exit(response.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  admin:
+    image: ${IMAGE_NAMESPACE}/percy-site-admin:${IMAGE_TAG:-main-latest}
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - '3000'
+    volumes:
+      - uploads_data:/app/storage/uploads
+    networks:
+      default:
+      edge:
+        aliases:
+          - percy-admin
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/api/health').then((response)=>process.exit(response.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  postgres_data:
+  uploads_data:
+
+networks:
+  edge:
+    external: true

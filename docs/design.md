@@ -1183,17 +1183,17 @@ packages:
 ### 13.1 域名规划
 
 ```txt
-percy.dev
-www.percy.dev
-admin.percy.dev
+percy.ren
+www.percy.ren
+admin.percy.ren
 ```
 
 推荐：
 
 ```txt
-percy.dev      -> apps/web
-www.percy.dev  -> redirect to percy.dev
-admin.percy.dev -> apps/admin
+percy.ren       -> apps/web
+www.percy.ren   -> redirect to percy.ren
+admin.percy.ren -> apps/admin
 ```
 
 ### 13.2 部署边界
@@ -1222,7 +1222,30 @@ PostgreSQL
 
 ### 13.3 部署平台
 
-可选：
+当前生产环境采用：
+
+```txt
+GitHub Actions
+  build percy-site-web image
+  build percy-site-admin image
+  build percy-site-migrate image
+  push to image registry
+  ssh trigger server deploy
+
+Self-hosted server
+  Docker Compose 管理 Percy Site 应用、数据库、迁移任务和上传文件 volume
+  服务器级 Caddy 统一占用 80 / 443
+  Percy Site 通过外部 Docker 网络 edge 接入 Caddy
+```
+
+原因：
+
+- 当前服务器会同时承载多个项目，不能让每个项目各自启动一个绑定 `80` / `443` 的 Caddy。
+- web 和 admin 仍然独立构建、独立容器运行，符合双域名部署边界。
+- PostgreSQL 和上传文件 volume 由 Percy Site 自己的 compose 管理，避免和其他项目的数据边界混在一起。
+- 发布流程与同服务器上的既有项目保持一致：镜像构建、远程拉取、迁移、健康检查、启动服务。
+
+可选平台仍然包括：
 
 ```txt
 Vercel
@@ -1234,6 +1257,12 @@ Render
 ```
 
 如果使用 Prisma + PostgreSQL + Nuxt server API，部署平台需要支持服务端运行时。
+
+生产部署操作手册见：
+
+```txt
+docs/deployment-runbook.md
+```
 
 ## 14. SEO 与内容分发
 
