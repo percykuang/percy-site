@@ -3,12 +3,12 @@
     <div v-if="article">
       <div class="min-w-0">
         <header class="border-soft-border border-b pb-6">
-          <div class="flex flex-wrap items-start gap-x-3 gap-y-2">
-            <h1 class="text-3xl leading-tight font-semibold text-balance md:text-4xl">
+          <div class="leading-tight">
+            <h1 class="inline text-3xl leading-tight font-semibold text-pretty md:text-4xl">
               {{ article.title }}
             </h1>
             <span
-              class="bg-primary-soft text-primary mt-1 inline-flex shrink-0 rounded-full px-2 py-0.5 text-[11px] leading-4 font-medium md:mt-2"
+              class="bg-primary-soft text-primary relative top-2 ml-3 inline-flex rounded-full px-2 py-0.5 align-top text-[11px] leading-4 font-medium"
             >
               {{ article.category }}
             </span>
