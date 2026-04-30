@@ -5,10 +5,14 @@
       <NuxtPage />
     </main>
     <SiteFooter />
+    <BackToTopButton />
+    <MarkdownImageLightbox />
   </div>
 </template>
 
 <script setup lang="ts">
+import BackToTopButton from './components/layout/BackToTopButton.vue'
+import MarkdownImageLightbox from './components/layout/MarkdownImageLightbox.vue'
 import SiteFooter from './components/layout/SiteFooter.vue'
 import SiteHeader from './components/layout/SiteHeader.vue'
 </script>

@@ -24,7 +24,7 @@
         <div class="mt-9 flex flex-wrap gap-3">
           <NuxtLink
             class="bg-primary text-primary-foreground hover:bg-primary-hover inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium shadow-sm transition-colors"
-            to="/blog"
+            to="/articles"
           >
             阅读文章
             <BookOpen class="size-4" aria-hidden="true" />
