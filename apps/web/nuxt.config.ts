@@ -23,15 +23,6 @@ export default defineNuxtConfig({
   devtools: {
     enabled: process.env.NUXT_DEVTOOLS === 'true',
   },
-  nitro: {
-    publicAssets: [
-      {
-        baseURL: '/uploads',
-        dir: uploadsDir,
-        maxAge: 60 * 60 * 24 * 365,
-      },
-    ],
-  },
   runtimeConfig: {
     sessionSecret: process.env.NUXT_SESSION_SECRET || '',
     uploadsDir,

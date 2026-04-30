@@ -174,8 +174,9 @@ storage/uploads
 NUXT_UPLOADS_DIR=/var/www/percy-site/uploads
 ```
 
-如果使用当前 Docker Compose 部署，`web` 和 `admin` 会共享同一个 `uploads-data`
-卷，并挂载到容器内的：
+如果使用当前 Docker Compose 部署，`web` 和 `admin` 会共享同一个上传卷，
+本地 compose 名称是 `uploads-data`，生产 compose 名称是 `uploads_data`，
+并挂载到容器内的：
 
 ```txt
 /app/storage/uploads
@@ -183,7 +184,9 @@ NUXT_UPLOADS_DIR=/var/www/percy-site/uploads
 
 ## 8. 静态访问路径设计
 
-资源文件建议通过静态路径对外访问，而不是走业务 API 回传二进制内容。
+资源文件建议通过稳定路径对外访问，而不是走资源业务 API 回传二进制内容。
+当前实现中，`/uploads/**` 是 Nuxt 服务端路由，会从 `NUXT_UPLOADS_DIR`
+指向的运行时目录读取文件并返回。
 
 推荐两种路径方案：
 

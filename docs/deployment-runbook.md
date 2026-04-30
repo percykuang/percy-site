@@ -71,7 +71,7 @@ ADMIN_INITIAL_PASSWORD=replace-with-a-strong-password
 - `DATABASE_URL` 的 host 必须是 `db`，这是 compose 内部服务名。
 - `NUXT_SESSION_SECRET` 必须是长随机字符串，用于签名后台登录 Cookie。
 - `ADMIN_INITIAL_PASSWORD` 只用于 seed 创建初始管理员。生产环境不要使用弱密码。
-- 上传文件存储在 Docker volume `uploads_data`，不是数据库字段本身。
+- 上传文件存储在 Docker volume `uploads_data`，不是数据库字段本身；资源 URL 由 `/uploads/**` 服务端路由从 `NUXT_UPLOADS_DIR` 读取并返回。
 
 ## 入口代理
 
@@ -92,6 +92,15 @@ admin.percy.ren {
 ```
 
 如果服务器当前仍由另一个项目内的 Caddy 占用 `80` / `443`，需要把它调整为统一入口代理，或把该 Caddy 连接到 `edge` 网络并追加以上站点配置。不要再为 Percy Site 单独启动第二个绑定 `80` / `443` 的 Caddy。
+
+上传资源发布后可以用下面的方式验证：
+
+```bash
+curl -I https://admin.percy.ren/uploads/images/2026/04/example.png
+curl -I https://percy.ren/uploads/images/2026/04/example.png
+```
+
+正常情况下应返回 `200`，并带有对应的 `Content-Type`。
 
 ## GitHub Secrets
 
