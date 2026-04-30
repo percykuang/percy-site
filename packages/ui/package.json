@@ -7,7 +7,6 @@
     "./styles.css": "./src/styles/globals.css"
   },
   "scripts": {
-    "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
