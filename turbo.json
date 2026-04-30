@@ -3,24 +3,21 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".output/**", "dist/**"]
+      "outputs": [".nuxt/**", ".output/**", "dist/**", "src/generated/prisma/**"]
     },
     "dev": {
       "cache": false,
       "persistent": true
     },
-    "lint": {
-      "dependsOn": ["^build"]
-    },
+    "lint": {},
     "lint:fix": {
-      "dependsOn": ["^build"],
       "cache": false
     },
     "typecheck": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^typecheck"]
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^typecheck"],
       "outputs": ["coverage/**"]
     },
     "db:generate": {

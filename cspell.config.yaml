@@ -19,31 +19,38 @@ ignorePaths:
   - '*.log'
 words:
   - admin
+  - antd
+  - anticon
   - bradlc
   - commitlint
   - composable
   - composables
+  - Consolas
   - cspell
   - cuid
   - datetime
   - dbaeumer
   - dotenv
   - esbenp
-  - evenodd
   - eslint
+  - evenodd
   - fkey
   - frontend
   - healthcheck
+  - Hiragino
   - isready
   - labelledby
   - linecap
   - linejoin
+  - linkify
   - lucide
   - Menlo
   - mikestead
   - monorepo
   - nologin
   - noninteractive
+  - noopener
+  - noreferrer
   - Nuxt
   - oklch
   - openapi
@@ -56,7 +63,10 @@ words:
   - PostgreSQL
   - Prettier
   - Prisma
+  - Segoe
   - shadcn
+  - Shiki
+  - sider
   - sitemap
   - stylelint
   - tailwind
@@ -65,5 +75,6 @@ words:
   - upsert
   - vite
   - vue
+  - vueform
   - webp
   - zod
