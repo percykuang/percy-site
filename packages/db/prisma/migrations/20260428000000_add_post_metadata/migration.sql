@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Post" ADD COLUMN "category" TEXT NOT NULL DEFAULT '前端工程';
+ALTER TABLE "Post" ADD COLUMN "wordCount" INTEGER NOT NULL DEFAULT 0;

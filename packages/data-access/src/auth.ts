@@ -1,5 +1,5 @@
 import { prisma, verifyPassword } from '@ps/db'
-import type { LoginInput } from '@ps/shared'
+import type { LoginInput } from '@ps/shared/auth'
 
 const adminUserSelect = {
   id: true,

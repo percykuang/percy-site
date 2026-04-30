@@ -50,27 +50,40 @@ model Project {
   @@index([published, featured, createdAt])
 }
 
-model Post {
-  id          String    @id @default(cuid())
+model Article {
+  id          String    @id
   title       String
   slug        String    @unique
+  categoryId  String
   excerpt     String
   content     String
   coverImage  String?
+  wordCount   Int       @default(0)
   published   Boolean   @default(false)
   publishedAt DateTime?
-  tags        Tag[]
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  tags        Tag[]     @relation("ArticleToTag")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
   @@index([published, publishedAt])
+  @@index([categoryId])
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  articles  Article[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Tag {
   id        String    @id @default(cuid())
-  name      String
+  name      String    @unique
   slug      String    @unique
-  posts     Post[]
+  articles  Article[] @relation("ArticleToTag")
   projects  Project[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

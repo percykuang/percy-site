@@ -1,9 +1,35 @@
 import { prisma } from '../src/index'
 import { hashPassword } from '../src/password'
+import { seedArticles } from './seed-data/articles'
+
+const weakAdminPasswords = new Set(['change-me', 'replace-with-a-strong-password'])
+
+function countWords(content: string) {
+  const englishWords = content.match(/[A-Za-z0-9]+(?:[-'][A-Za-z0-9]+)*/g) ?? []
+  const cjkCharacters = content.match(/[\u3400-\u9fff]/g) ?? []
+
+  return englishWords.length + cjkCharacters.length
+}
+
+function createArticleId() {
+  return globalThis.crypto.randomUUID().replace(/-/g, '')
+}
+
+function assertProductionAdminPassword(password: string) {
+  if (process.env.NODE_ENV !== 'production') {
+    return
+  }
+
+  if (weakAdminPasswords.has(password.trim())) {
+    throw new Error('ADMIN_INITIAL_PASSWORD must be changed before running seed in production')
+  }
+}
 
 async function main() {
   const adminEmail = process.env.ADMIN_EMAIL ?? 'admin@example.com'
   const adminPassword = process.env.ADMIN_INITIAL_PASSWORD ?? 'change-me'
+
+  assertProductionAdminPassword(adminPassword)
 
   await prisma.user.upsert({
     where: {
@@ -40,20 +66,86 @@ async function main() {
     },
   })
 
-  await prisma.post.upsert({
+  await prisma.article.updateMany({
     where: {
       slug: 'hello-percy-site',
     },
-    update: {},
-    create: {
-      title: 'Hello Percy Site',
-      slug: 'hello-percy-site',
-      excerpt: '记录 Percy Site 的设计目标和技术选型。',
-      content: '这是 Percy Site 的第一篇文章。',
-      published: true,
-      publishedAt: new Date(),
+    data: {
+      published: false,
     },
   })
+
+  for (const article of seedArticles) {
+    const category = await prisma.category.upsert({
+      where: {
+        name: article.category,
+      },
+      update: {
+        slug: article.categorySlug,
+      },
+      create: {
+        name: article.category,
+        slug: article.categorySlug,
+      },
+    })
+
+    for (const tag of article.tags) {
+      await prisma.tag.upsert({
+        where: {
+          name: tag.name,
+        },
+        update: {
+          slug: tag.slug,
+        },
+        create: tag,
+      })
+    }
+
+    const content = article.content.join('\n\n')
+    const tagConnections = article.tags.map((tag) => ({
+      slug: tag.slug,
+    }))
+
+    await prisma.article.upsert({
+      where: {
+        slug: article.slug,
+      },
+      update: {
+        category: {
+          connect: {
+            id: category.id,
+          },
+        },
+        content,
+        excerpt: article.excerpt,
+        published: true,
+        publishedAt: article.publishedAt,
+        tags: {
+          set: tagConnections,
+        },
+        title: article.title,
+        wordCount: countWords(content),
+      },
+      create: {
+        category: {
+          connect: {
+            id: category.id,
+          },
+        },
+        content,
+        excerpt: article.excerpt,
+        id: createArticleId(),
+        published: true,
+        publishedAt: article.publishedAt,
+        slug: article.slug,
+        tags: {
+          connect: tagConnections,
+        },
+        title: article.title,
+        wordCount: countWords(content),
+      },
+    })
+  }
 }
 
 main()

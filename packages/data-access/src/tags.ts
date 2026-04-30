@@ -1,5 +1,13 @@
 import { prisma } from '@ps/db'
-import type { CreateTagInput, UpdateTagInput } from '@ps/shared'
+import type { CreateTagInput } from '@ps/shared/tag'
+import { createScopedSlug } from '@ps/shared/utils'
+
+export class TagNotFoundError extends Error {
+  constructor() {
+    super('Tag not found')
+    this.name = 'TagNotFoundError'
+  }
+}
 
 export function listTags() {
   return prisma.tag.findMany({
@@ -10,24 +18,44 @@ export function listTags() {
 }
 
 export function createTag(input: CreateTagInput) {
-  return prisma.tag.create({
-    data: input,
+  const name = input.name.trim()
+  const slug = normalizeTagSlug(name)
+
+  return prisma.tag.upsert({
+    where: {
+      name,
+    },
+    update: {
+      slug,
+    },
+    create: {
+      name,
+      slug,
+    },
   })
 }
 
-export function updateTag(id: string, input: UpdateTagInput) {
-  return prisma.tag.update({
+export async function deleteTag(id: string) {
+  const tag = await prisma.tag.findUnique({
     where: {
       id,
     },
-    data: input,
+    select: {
+      id: true,
+    },
   })
-}
 
-export function deleteTag(id: string) {
+  if (!tag) {
+    throw new TagNotFoundError()
+  }
+
   return prisma.tag.delete({
     where: {
       id,
     },
   })
+}
+
+function normalizeTagSlug(name: string) {
+  return createScopedSlug(name, 'tag')
 }

@@ -3,10 +3,16 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./api": "./src/api.ts",
+    "./article": "./src/article.ts",
+    "./auth": "./src/auth.ts",
+    "./category": "./src/category.ts",
+    "./pagination": "./src/pagination.ts",
+    "./tag": "./src/tag.ts",
+    "./utils": "./src/utils.ts"
   },
   "scripts": {
-    "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
