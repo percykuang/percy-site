@@ -9,6 +9,7 @@
     "./auth": "./src/auth.ts",
     "./category": "./src/category.ts",
     "./pagination": "./src/pagination.ts",
+    "./resource": "./src/resource.ts",
     "./tag": "./src/tag.ts",
     "./utils": "./src/utils.ts"
   },

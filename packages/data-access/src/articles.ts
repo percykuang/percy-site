@@ -7,6 +7,7 @@ import {
 } from '@ps/shared/article'
 import type { PaginationQueryInput } from '@ps/shared/pagination'
 import { createScopedSlug } from '@ps/shared/utils'
+import { deleteArticleResourceReferences, syncArticleResourceReferences } from './resources'
 
 export class ArticleNotFoundError extends Error {
   constructor() {
@@ -41,6 +42,11 @@ type BaseArticleRecord = {
 type ArticleDetailRecord = BaseArticleRecord & {
   content: string
 }
+
+type ArticleDbClient = Pick<
+  typeof prisma,
+  'article' | 'category' | 'resource' | 'resourceReference' | 'tag'
+>
 
 const publicArticleSelect = {
   id: true,
@@ -149,11 +155,12 @@ export function getAdminArticleById(id: string) {
 
 export async function createArticle(input: CreateArticleInput) {
   const id = createArticleId()
-  const category = await upsertArticleCategory(input.category)
-  const tags = await upsertArticleTags(input.tags)
 
-  return prisma.article
-    .create({
+  return prisma.$transaction(async (tx) => {
+    const category = await upsertArticleCategory(input.category, tx)
+    const tags = await upsertArticleTags(input.tags, tx)
+
+    const article = await tx.article.create({
       data: {
         category: {
           connect: {
@@ -174,7 +181,17 @@ export async function createArticle(input: CreateArticleInput) {
       },
       select: adminArticleDetailSelect,
     })
-    .then(mapAdminArticleDetail)
+
+    await syncArticleResourceReferences(
+      {
+        articleId: id,
+        content: input.content,
+      },
+      tx,
+    )
+
+    return mapAdminArticleDetail(article)
+  })
 }
 
 export async function updateArticle(id: string, input: UpdateArticleInput) {
@@ -192,12 +209,13 @@ export async function updateArticle(id: string, input: UpdateArticleInput) {
   }
 
   const { tags: inputTags, category: inputCategory, ...articleInput } = input
-  const category = inputCategory ? await upsertArticleCategory(inputCategory) : undefined
-  const tags = inputTags ? await upsertArticleTags(inputTags) : undefined
   const wordCount = input.wordCount || (input.content ? countWords(input.content) : input.wordCount)
 
-  return prisma.article
-    .update({
+  return prisma.$transaction(async (tx) => {
+    const category = inputCategory ? await upsertArticleCategory(inputCategory, tx) : undefined
+    const tags = inputTags ? await upsertArticleTags(inputTags, tx) : undefined
+
+    const article = await tx.article.update({
       where: {
         id,
       },
@@ -223,12 +241,22 @@ export async function updateArticle(id: string, input: UpdateArticleInput) {
       },
       select: adminArticleDetailSelect,
     })
-    .then(mapAdminArticleDetail)
+
+    await syncArticleResourceReferences(
+      {
+        articleId: id,
+        content: article.content,
+      },
+      tx,
+    )
+
+    return mapAdminArticleDetail(article)
+  })
 }
 
-export function deleteArticle(id: string) {
-  return prisma.article
-    .findUnique({
+export async function deleteArticle(id: string) {
+  return prisma.$transaction(async (tx) => {
+    const article = await tx.article.findUnique({
       where: {
         id,
       },
@@ -236,24 +264,26 @@ export function deleteArticle(id: string) {
         id: true,
       },
     })
-    .then((article) => {
-      if (!article) {
-        throw new ArticleNotFoundError()
-      }
 
-      return prisma.article.delete({
-        where: {
-          id,
-        },
-      })
+    if (!article) {
+      throw new ArticleNotFoundError()
+    }
+
+    await deleteArticleResourceReferences(id, tx)
+
+    return tx.article.delete({
+      where: {
+        id,
+      },
     })
+  })
 }
 
-async function upsertArticleCategory(name: string) {
+async function upsertArticleCategory(name: string, db: ArticleDbClient = prisma) {
   const categoryName = name.trim()
   const slug = createScopedSlug(categoryName, 'category')
 
-  return prisma.category.upsert({
+  return db.category.upsert({
     where: {
       name: categoryName,
     },
@@ -267,25 +297,23 @@ async function upsertArticleCategory(name: string) {
   })
 }
 
-async function upsertArticleTags(tags: CreateArticleInput['tags']) {
+async function upsertArticleTags(tags: CreateArticleInput['tags'], db: ArticleDbClient = prisma) {
   const normalizedTags = tags.map((tag, index) => ({
     name: tag.name,
     slug: createScopedSlug(tag.slug, 'tag', index + 1),
   }))
 
-  await prisma.$transaction(
-    normalizedTags.map((tag) =>
-      prisma.tag.upsert({
-        where: {
-          name: tag.name,
-        },
-        update: {
-          slug: tag.slug,
-        },
-        create: tag,
-      }),
-    ),
-  )
+  for (const tag of normalizedTags) {
+    await db.tag.upsert({
+      where: {
+        name: tag.name,
+      },
+      update: {
+        slug: tag.slug,
+      },
+      create: tag,
+    })
+  }
 
   return normalizedTags.map((tag) => ({
     slug: tag.slug,
