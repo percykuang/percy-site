@@ -19,6 +19,7 @@ ignorePaths:
   - '*.log'
 words:
   - admin
+  - ALIYUN
   - antd
   - anticon
   - bradlc
@@ -35,10 +36,12 @@ words:
   - eslint
   - evenodd
   - fkey
+  - flac
   - frontend
   - healthcheck
   - Hiragino
   - isready
+  - Lightbox
   - labelledby
   - linecap
   - linejoin
@@ -63,6 +66,7 @@ words:
   - PostgreSQL
   - Prettier
   - Prisma
+  - quicktime
   - Segoe
   - shadcn
   - Shiki

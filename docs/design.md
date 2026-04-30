@@ -9,7 +9,7 @@ Percy Site 是一个面向前端开发者的个人主页系统，不只是静态
 - 展示个人前端开发能力、工程化能力和产品审美。
 - 第一版前台保持极简，只展示个人介绍、技术文章、分类页和关于页。
 - 项目展示和联系表单暂不放入前台，后续内容成熟后再恢复。
-- 第一版后台聚焦文章管理；分类和标签作为文章元数据能力提供，不提供独立标签管理页。项目管理、联系消息管理和站点设置页暂不接入后台。
+- 第一版后台聚焦文章管理和资源管理；分类和标签作为文章元数据能力提供，不提供独立标签管理页。项目管理、联系消息管理和站点设置页暂不接入后台。
 - 通过 monorepo 架构沉淀公共组件、数据访问和类型定义。
 - 使用现代 Vue 技术栈，体现 Vue 3、TypeScript、Nuxt、Tailwind CSS、Prisma 和 PostgreSQL 的综合实践能力。
 
@@ -19,6 +19,10 @@ Percy Site 是一个面向前端开发者的个人主页系统，不只是静态
 percy.dev          # 个人主页前台
 admin.percy.dev    # 管理后台
 ```
+
+补充设计文档：
+
+- 资源管理详细设计见 `docs/resource-management.md`
 
 ## 2. 技术选型
 
@@ -188,6 +192,7 @@ apps/web/
 
 - 管理员登录。
 - 文章 CRUD。
+- 资源上传与管理。
 - 分类与标签支撑接口。
 - 后台 API。
 
@@ -204,6 +209,8 @@ apps/admin/
         index.vue
         [id].vue
         new.vue
+      resources/
+        index.vue
     layouts/
       default.vue
       auth.vue
@@ -220,6 +227,12 @@ apps/admin/
         logout.post.ts
         me.get.ts
       articles/
+        index.get.ts
+        index.post.ts
+        [id].get.ts
+        [id].patch.ts
+        [id].delete.ts
+      resources/
         index.get.ts
         index.post.ts
         [id].get.ts
@@ -930,6 +943,17 @@ POST   /api/articles
 GET    /api/articles/[id]
 PATCH  /api/articles/[id]
 DELETE /api/articles/[id]
+```
+
+资源：
+
+```txt
+GET    /api/resources
+POST   /api/resources
+GET    /api/resources/[id]
+PATCH  /api/resources/[id]
+DELETE /api/resources/[id]
+GET    /api/resources/[id]/references
 ```
 
 分类与标签支撑：
