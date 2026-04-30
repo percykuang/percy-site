@@ -16,8 +16,8 @@ Percy Site 是一个面向前端开发者的个人主页系统，不只是静态
 核心访问入口：
 
 ```txt
-percy.dev          # 个人主页前台
-admin.percy.dev    # 管理后台
+percy.ren          # 个人主页前台
+admin.percy.ren    # 管理后台
 ```
 
 补充设计文档：
@@ -487,19 +487,19 @@ admin 不直接承载公开展示页面。
 web API：
 
 ```txt
-percy.dev/api/articles
-percy.dev/api/articles/[id]
+percy.ren/api/articles
+percy.ren/api/articles/[id]
 ```
 
 admin API：
 
 ```txt
-admin.percy.dev/api/auth/login
-admin.percy.dev/api/auth/logout
-admin.percy.dev/api/auth/me
-admin.percy.dev/api/articles
-admin.percy.dev/api/categories
-admin.percy.dev/api/tags
+admin.percy.ren/api/auth/login
+admin.percy.ren/api/auth/logout
+admin.percy.ren/api/auth/me
+admin.percy.ren/api/articles
+admin.percy.ren/api/categories
+admin.percy.ren/api/tags
 ```
 
 web 调用 web 自己的 API。
@@ -509,7 +509,7 @@ admin 调用 admin 自己的 API。
 避免：
 
 ```txt
-admin.percy.dev 调用 percy.dev/api/admin
+admin.percy.ren 调用 percy.ren/api/admin
 ```
 
 这样可以减少 CORS、Cookie 跨域和鉴权复杂度。
@@ -994,7 +994,7 @@ admin 域名独立维护登录态
 推荐 Cookie 策略：
 
 ```txt
-Domain: 不设置，默认只作用于 admin.percy.dev
+Domain: 不设置，默认只作用于 admin.percy.ren
 Path: /
 HttpOnly: true
 Secure: true
@@ -1004,7 +1004,7 @@ SameSite: Lax
 登录流程：
 
 ```txt
-1. 用户访问 admin.percy.dev/login
+1. 用户访问 admin.percy.ren/login
 2. 提交邮箱和密码
 3. server/api/auth/login 校验密码
 4. 创建 session
@@ -1395,7 +1395,7 @@ SEO 基础配置
 交付：
 
 ```txt
-percy.dev 可以上线展示
+percy.ren 可以上线展示
 ```
 
 ### 第三阶段：后台 MVP
@@ -1412,7 +1412,7 @@ percy.dev 可以上线展示
 交付：
 
 ```txt
-admin.percy.dev 可以登录并管理内容
+admin.percy.ren 可以登录并管理内容
 ```
 
 ### 第四阶段：体验增强

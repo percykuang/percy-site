@@ -192,7 +192,7 @@ NUXT_UPLOADS_DIR=/var/www/percy-site/uploads
 独立静态子域名：
 
 ```txt
-https://static.percy.dev/uploads/images/2026/04/clx123abc.webp
+https://static.percy.ren/uploads/images/2026/04/clx123abc.webp
 ```
 
 优点：
@@ -206,7 +206,7 @@ https://static.percy.dev/uploads/images/2026/04/clx123abc.webp
 挂在主站域名下：
 
 ```txt
-https://percy.dev/uploads/images/2026/04/clx123abc.webp
+https://percy.ren/uploads/images/2026/04/clx123abc.webp
 ```
 
 第一阶段如果部署和域名管理还没拆开，可以先用这个方案。
@@ -354,7 +354,7 @@ model ResourceReference {
 图片第一阶段可以继续走标准 Markdown：
 
 ```md
-![图片说明](https://static.percy.dev/uploads/images/2026/04/clx123.webp '图片标题')
+![图片说明](https://static.percy.ren/uploads/images/2026/04/clx123.webp '图片标题')
 ```
 
 这是当前最省成本、兼容性最好的方式。

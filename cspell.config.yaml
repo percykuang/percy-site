@@ -45,8 +45,8 @@ words:
   - healthcheck
   - Hiragino
   - isready
-  - Lightbox
   - labelledby
+  - Lightbox
   - linecap
   - linejoin
   - linkify
@@ -80,6 +80,7 @@ words:
   - stylelint
   - tailwind
   - tamasfe
+  - Turborepo
   - typecheck
   - upsert
   - vite
