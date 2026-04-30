@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { FileTextOutlined, LogoutOutlined } from '@ant-design/icons-vue'
+import { FileImageOutlined, FileTextOutlined, LogoutOutlined } from '@ant-design/icons-vue'
 import { Logo } from '@ps/ui'
 
 const route = useRoute()
@@ -77,6 +77,11 @@ const navItems = [
     icon: FileTextOutlined,
     label: '文章',
     to: '/articles',
+  },
+  {
+    icon: FileImageOutlined,
+    label: '资源',
+    to: '/resources',
   },
 ] as const
 
