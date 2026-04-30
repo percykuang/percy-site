@@ -3,12 +3,29 @@ import type { H3Event } from 'h3'
 
 const sessionCookieName = 'ps_admin_session'
 const sessionMaxAge = 60 * 60 * 24 * 7
+const minimumSessionSecretLength = 32
+const weakSessionSecrets = new Set(['change-me', 'dev-session-secret'])
+
+function normalizeSessionSecret(secret: string | undefined) {
+  return secret?.trim() ?? ''
+}
+
+function isWeakSessionSecret(secret: string) {
+  return secret.length < minimumSessionSecretLength || weakSessionSecrets.has(secret)
+}
 
 function getSessionSecret(event: H3Event) {
   const config = useRuntimeConfig(event)
-  const secret = config.sessionSecret || process.env.NUXT_SESSION_SECRET
+  const secret = normalizeSessionSecret(config.sessionSecret || process.env.NUXT_SESSION_SECRET)
 
   if (secret) {
+    if (process.env.NODE_ENV === 'production' && isWeakSessionSecret(secret)) {
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'NUXT_SESSION_SECRET is too weak for production',
+      })
+    }
+
     return secret
   }
 

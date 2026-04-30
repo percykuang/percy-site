@@ -1,13 +1,11 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-  const headers = import.meta.server ? useRequestHeaders(['cookie']) : undefined
+  const { fetchSession } = useAdminSession()
 
   try {
-    await $fetch('/api/auth/me', {
-      headers,
-    })
+    await fetchSession(true)
 
-    if (to.path === '/login') {
-      return navigateTo('/')
+    if (to.path === '/login' || to.path === '/') {
+      return navigateTo('/articles')
     }
   } catch {
     if (to.path !== '/login') {

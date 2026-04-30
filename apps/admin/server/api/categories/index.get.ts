@@ -1,8 +1,8 @@
-import { listTags } from '@ps/data-access'
+import { listCategories } from '@ps/data-access'
 import { ok } from '../../utils/api'
 
 export default defineEventHandler(async (event) => {
   await requireAuth(event)
 
-  return ok(await listTags())
+  return ok(await listCategories())
 })

@@ -1,64 +1,82 @@
 <template>
-  <section class="border-border bg-background w-full max-w-sm rounded-lg border p-6">
-    <h1 class="text-xl font-semibold">登录后台</h1>
-    <form class="mt-6 grid gap-4" @submit.prevent="submit">
-      <label class="grid gap-2 text-sm">
-        <span>邮箱</span>
-        <input
-          v-model="email"
-          class="border-border bg-background rounded-md border px-3 py-2"
-          type="email"
-          autocomplete="email"
-          required
-        />
-      </label>
-      <label class="grid gap-2 text-sm">
-        <span>密码</span>
-        <input
-          v-model="password"
-          class="border-border bg-background rounded-md border px-3 py-2"
-          type="password"
-          autocomplete="current-password"
-          required
-        />
-      </label>
-      <p v-if="error" class="text-destructive text-sm">{{ error }}</p>
-      <button
-        class="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-60"
-        type="submit"
-        :disabled="pending"
+  <div
+    class="w-full max-w-md rounded-3xl border border-white/10 bg-[rgb(11_20_34/0.78)] p-8 shadow-[0_24px_80px_rgb(0_0_0/0.34)] backdrop-blur-xl"
+  >
+    <a-form class="admin-login-form" layout="vertical" :model="form" @finish="submit">
+      <a-form-item
+        label="邮箱"
+        name="email"
+        :rules="[{ required: true, type: 'email', message: '请输入有效邮箱' }]"
       >
-        {{ pending ? '登录中' : '登录' }}
-      </button>
-    </form>
-  </section>
+        <a-input
+          v-model:value="form.email"
+          autocomplete="email"
+          placeholder="admin@example.com"
+          size="large"
+        />
+      </a-form-item>
+
+      <a-form-item
+        label="密码"
+        name="password"
+        :rules="[{ required: true, message: '请输入密码' }]"
+      >
+        <a-input-password
+          v-model:value="form.password"
+          autocomplete="current-password"
+          placeholder="请输入密码"
+          size="large"
+        />
+      </a-form-item>
+
+      <a-alert v-if="error" class="mb-4" type="error" show-icon :message="error" />
+
+      <a-button
+        class="admin-login-submit h-13 rounded-xl"
+        block
+        html-type="submit"
+        size="large"
+        type="primary"
+        :loading="pending"
+        :disabled="!form.email.trim() || !form.password"
+      >
+        登录
+      </a-button>
+    </a-form>
+  </div>
 </template>
 
 <script setup lang="ts">
+import type { AdminAuthState } from '@ps/shared/auth'
+
 definePageMeta({
   layout: 'auth',
 })
 
-const email = ref('')
-const password = ref('')
+const form = reactive({
+  email: '',
+  password: '',
+})
 const error = ref('')
 const pending = ref(false)
+const { setSession } = useAdminSession()
 
 async function submit() {
   error.value = ''
   pending.value = true
 
   try {
-    await $fetch('/api/auth/login', {
+    const session = await adminApiFetch<AdminAuthState>('/api/auth/login', {
       method: 'POST',
       body: {
-        email: email.value,
-        password: password.value,
+        email: form.email,
+        password: form.password,
       },
     })
-    await navigateTo('/')
-  } catch {
-    error.value = '邮箱或密码不正确'
+    setSession(session)
+    await navigateTo('/articles')
+  } catch (fetchError) {
+    error.value = getAdminApiErrorMessage(fetchError, '邮箱或密码不正确')
   } finally {
     pending.value = false
   }

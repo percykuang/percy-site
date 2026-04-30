@@ -1,14 +1,335 @@
+@layer theme, base, antd, components, utilities;
+
 @import 'tailwindcss';
-@import '@ps/ui/styles.css';
 
 @theme {
-  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+    monospace;
 }
 
 body {
   margin: 0;
-  background: var(--background);
-  color: var(--foreground);
+  position: relative;
+  height: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #fff;
+  color: #111827;
   font-family: var(--font-sans);
+}
+
+html,
+body {
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.admin-shell {
+  align-items: stretch;
+  display: flex;
+  flex-direction: row;
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  overflow: auto hidden;
+  background: #fff;
+}
+
+.admin-sider {
+  align-self: flex-start;
+  flex: 0 0 256px !important;
+  width: 256px !important;
+  min-width: 256px !important;
+  max-width: 256px !important;
+  height: 100vh;
+  inset-inline-start: 0;
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  bottom: 0;
+  border-right: 1px solid rgb(255 255 255 / 8%);
+  background: #0f1b2d !important;
+  box-shadow:
+    inset -1px 0 0 rgb(255 255 255 / 4%),
+    10px 0 28px rgb(15 23 42 / 18%);
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+}
+
+.admin-main-layout {
+  display: block;
+  flex: 1 0 1120px;
+  width: auto;
+  min-width: 1120px;
+  background: #fff;
+}
+
+.admin-content {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-height: 100vh;
+  overflow: auto;
+  padding: 24px 32px;
+  background: #fff;
+}
+
+.admin-content-inner {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+}
+
+.admin-nav-menu.ant-menu,
+.admin-nav-menu.ant-menu-dark,
+.admin-nav-menu.ant-menu-dark .ant-menu-sub {
+  background: transparent !important;
+  color: rgb(255 255 255 / 68%);
+  border-inline-end: none !important;
+}
+
+.admin-nav-menu.ant-menu-dark .ant-menu-item,
+.admin-nav-menu.ant-menu-dark .ant-menu-submenu-title {
+  width: calc(100% - 24px);
+  margin-inline: 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+}
+
+.admin-nav-menu.ant-menu-dark .ant-menu-item:hover,
+.admin-nav-menu.ant-menu-dark .ant-menu-item-active,
+.admin-nav-menu.ant-menu-dark .ant-menu-submenu-title:hover {
+  background: rgb(255 255 255 / 6%) !important;
+  color: #fff !important;
+}
+
+.ant-btn .anticon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.admin-logout-button.ant-btn .anticon {
+  font-size: 1rem;
+}
+
+.admin-nav-menu.ant-menu-dark .ant-menu-item-selected,
+.admin-nav-menu.ant-menu-dark .ant-menu-submenu-selected > .ant-menu-submenu-title {
+  border-color: rgb(104 155 255 / 22%) !important;
+  background: rgb(57 106 201 / 18%) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%);
+}
+
+.admin-nav-menu.ant-menu-dark .ant-menu-item-selected,
+.admin-nav-menu.ant-menu-dark .ant-menu-item-selected .ant-menu-title-content,
+.admin-nav-menu.ant-menu-dark .ant-menu-item-selected .anticon {
+  color: #fff !important;
+}
+
+.ant-layout-sider-children {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.ant-table-wrapper .ant-table-cell {
+  vertical-align: top;
+}
+
+.admin-table-ellipsis {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.admin-login-form .ant-form-item-label > label {
+  color: #dbe7ff;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.admin-login-form .ant-input,
+.admin-login-form .ant-input-affix-wrapper {
+  height: 3.25rem;
+  border-color: rgb(255 255 255 / 10%);
+  border-radius: 0.75rem;
+  background: rgb(255 255 255 / 6%);
+  color: #fff;
+  box-shadow: none;
+}
+
+.admin-login-form .ant-input::placeholder,
+.admin-login-form .ant-input-affix-wrapper .ant-input::placeholder {
+  color: #94a3b8;
+}
+
+.admin-login-form .ant-input-affix-wrapper .ant-input {
+  height: auto;
+  border: 0;
+  background: transparent;
+}
+
+.admin-login-form .ant-input:hover,
+.admin-login-form .ant-input-affix-wrapper:hover {
+  border-color: #4d76c5;
+}
+
+.admin-login-form .ant-input:focus,
+.admin-login-form .ant-input-affix-wrapper-focused {
+  border-color: #5d89e8;
+  box-shadow: 0 0 0 2px rgb(77 118 197 / 18%);
+}
+
+.admin-login-form .ant-input-password-icon {
+  color: #94a3b8;
+}
+
+.admin-logout-button.ant-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid rgb(158 190 255 / 18%);
+  background: rgb(255 255 255 / 6%);
+  color: rgb(226 235 255 / 88%);
+  box-shadow: none;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.admin-logout-button.ant-btn:hover,
+.admin-logout-button.ant-btn:focus {
+  border-color: rgb(158 190 255 / 34%);
+  background: rgb(77 118 197 / 18%);
+  color: #fff;
+}
+
+.admin-login-submit.ant-btn-primary {
+  border-color: rgb(126 166 248 / 88%);
+  background: linear-gradient(180deg, #5f8ff0, #4a78dc);
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 12%),
+    0 14px 26px rgb(74 120 220 / 26%);
+}
+
+.admin-login-submit.ant-btn-primary:hover,
+.admin-login-submit.ant-btn-primary:focus {
+  border-color: #7ea6f8;
+  background: linear-gradient(180deg, #6a98f4, #537fe1);
+  color: #fff;
+}
+
+.admin-login-submit.ant-btn-primary.ant-btn-loading,
+.admin-login-submit.ant-btn-primary.ant-btn-loading:hover {
+  color: #fff;
+}
+
+.admin-login-submit.ant-btn-primary:disabled,
+.admin-login-submit.ant-btn-primary.ant-btn-disabled {
+  border-color: rgb(255 255 255 / 10%);
+  background: rgb(255 255 255 / 4%);
+  color: rgb(148 163 184 / 44%);
+  box-shadow: none;
+}
+
+.admin-article-content-card.ant-card,
+.admin-article-meta-card.ant-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-article-content-card.ant-card {
+  min-height: 0;
+}
+
+.admin-article-content-card > .ant-card-head,
+.admin-article-meta-card > .ant-card-head {
+  flex: 0 0 auto;
+}
+
+.admin-article-content-card > .ant-card-body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.admin-article-editor-field.ant-form-item {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  margin-bottom: 0;
+  min-height: 0;
+}
+
+.admin-article-editor-field .ant-form-item-row {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+}
+
+.admin-article-editor-field .ant-form-item-control,
+.admin-article-editor-field .ant-form-item-control-input,
+.admin-article-editor-field .ant-form-item-control-input-content {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+}
+
+.admin-article-editor-field .ant-form-item-control-input {
+  align-items: stretch;
+}
+
+.admin-article-editor-field .ant-form-item-control-input-content {
+  align-self: stretch;
+  overflow: hidden;
+  padding: 24px 0 24px 24px;
+}
+
+.ant-input.admin-markdown-editor {
+  display: block;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100% !important;
+  padding: 0 24px 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #111827;
+  font-family: var(--font-mono);
+  line-height: 1.8;
+  overflow-y: auto;
+  resize: none;
+}
+
+.ant-input.admin-markdown-editor:hover,
+.ant-input.admin-markdown-editor:focus {
+  border-color: transparent;
+  box-shadow: none;
 }

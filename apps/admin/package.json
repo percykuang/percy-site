@@ -13,15 +13,17 @@
     "test": "echo \"tests not configured for @ps/admin yet\""
   },
   "dependencies": {
+    "@ant-design-vue/nuxt": "^1.4.6",
+    "@ant-design/icons-vue": "^7.0.1",
     "@ps/data-access": "workspace:*",
     "@ps/shared": "workspace:*",
     "@ps/ui": "workspace:*",
     "@tailwindcss/vite": "^4.2.4",
-    "lucide-vue-next": "^1.0.0",
+    "ant-design-vue": "^4.2.6",
+    "dayjs": "^1.11.20",
     "nuxt": "^4.4.2",
     "tailwindcss": "^4.2.4",
-    "vue": "^3.5.33",
-    "vue-router": "^5.0.6"
+    "vue": "^3.5.33"
   },
   "devDependencies": {
     "@vue/language-core": "^3.2.7",
