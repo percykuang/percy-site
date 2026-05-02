@@ -1234,13 +1234,14 @@ GitHub Actions
 
 Self-hosted server
   Docker Compose 管理 Percy Site 应用、数据库、迁移任务和上传文件 volume
-  服务器级 Caddy 统一占用 80 / 443
-  Percy Site 通过外部 Docker 网络 edge 接入 Caddy
+  独立 edge-proxy 统一占用 80 / 443
+  Percy Site 通过外部 Docker 网络 edge 接入 edge-proxy
 ```
 
 原因：
 
 - 当前服务器会同时承载多个项目，不能让每个项目各自启动一个绑定 `80` / `443` 的 Caddy。
+- 统一入口代理应作为独立部署单元维护，避免把代理配置散落在具体业务项目仓库里。
 - web 和 admin 仍然独立构建、独立容器运行，符合双域名部署边界。
 - PostgreSQL 和上传文件 volume 由 Percy Site 自己的 compose 管理，避免和其他项目的数据边界混在一起。
 - 发布流程与同服务器上的既有项目保持一致：镜像构建、远程拉取、迁移、健康检查、启动服务。

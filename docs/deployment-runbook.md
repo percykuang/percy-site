@@ -1,6 +1,6 @@
 # Percy Site 生产部署手册
 
-本文档记录 Percy Site 部署到自有服务器的约定。当前服务器还会承载其他项目，所以 Percy Site 不直接占用 `80` / `443` 端口，而是接入服务器级统一入口代理。
+本文档记录 Percy Site 部署到自有服务器的约定。当前服务器还会承载其他项目，所以 Percy Site 不直接占用 `80` / `443` 端口，而是接入独立维护的 `edge-proxy` 统一入口代理。
 
 ## 部署架构
 
@@ -9,7 +9,7 @@ DNS
   percy.ren        -> server ip
   admin.percy.ren  -> server ip
 
-edge proxy Caddy
+edge-proxy
   percy.ren        -> percy-web:3000
   admin.percy.ren  -> percy-admin:3000
 
@@ -28,7 +28,7 @@ percy-site-prod
 
 - Docker。
 - Docker Compose plugin。
-- 一个已经占用 `80` / `443` 的统一入口 Caddy，或者准备将现有项目内的 Caddy 迁移成统一入口 Caddy。
+- 一个独立维护、已经占用 `80` / `443` 的 `edge-proxy` 入口代理。
 
 首次部署前创建部署目录：
 
@@ -75,23 +75,14 @@ ADMIN_INITIAL_PASSWORD=replace-with-a-strong-password
 
 ## 入口代理
 
-服务器级 Caddy 需要加入同一个 Docker 网络 `edge`，然后添加 Percy 域名配置。
+`edge-proxy` 需要加入同一个 Docker 网络 `edge`，然后在它自己的代理配置中为 Percy 添加以下 upstream：
 
-参考配置见 [deploy/edge.Caddyfile.example](../deploy/edge.Caddyfile.example)：
+- `percy.ren -> percy-web:3000`
+- `admin.percy.ren -> percy-admin:3000`
 
-```caddyfile
-percy.ren {
-  encode zstd gzip
-  reverse_proxy percy-web:3000
-}
+Percy Site 仓库不再保存边缘代理的 Caddy 配置样例，避免应用仓库和统一入口代理仓库各自维护一份配置，后续再出现串站或配置漂移。
 
-admin.percy.ren {
-  encode zstd gzip
-  reverse_proxy percy-admin:3000
-}
-```
-
-如果服务器当前仍由另一个项目内的 Caddy 占用 `80` / `443`，需要把它调整为统一入口代理，或把该 Caddy 连接到 `edge` 网络并追加以上站点配置。不要再为 Percy Site 单独启动第二个绑定 `80` / `443` 的 Caddy。
+如果服务器当前仍由某个业务项目内的 Caddy 占用 `80` / `443`，建议先把它迁移成独立的 `edge-proxy` 服务，再由 Percy Site 和其他项目统一接入。不要再为 Percy Site 单独启动第二个绑定 `80` / `443` 的 Caddy。
 
 上传资源发布后可以用下面的方式验证：
 

@@ -1,9 +1,0 @@
-percy.ren {
-  encode zstd gzip
-  reverse_proxy percy-web:3000
-}
-
-admin.percy.ren {
-  encode zstd gzip
-  reverse_proxy percy-admin:3000
-}
