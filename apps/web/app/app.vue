@@ -4,7 +4,6 @@
     <main class="flex-1">
       <NuxtPage />
     </main>
-    <SiteFooter />
     <BackToTopButton />
     <ImageLightbox
       :alt="markdownImageViewer.alt"
@@ -18,7 +17,6 @@
 <script setup lang="ts">
 import { ImageLightbox } from '@ps/ui'
 import BackToTopButton from './components/layout/BackToTopButton.vue'
-import SiteFooter from './components/layout/SiteFooter.vue'
 import SiteHeader from './components/layout/SiteHeader.vue'
 
 const { closeMarkdownImageViewer, markdownImageViewer } = useMarkdownImageViewer()

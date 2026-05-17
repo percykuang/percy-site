@@ -23,7 +23,7 @@
 
 ## 不适合放入的内容
 
-- `SiteHeader` / `SiteFooter` 这类站点结构组件
+- `SiteHeader` 这类站点结构组件
 - `ArticleForm` 这类后台业务表单
 - 依赖服务端数据访问的组件
 - 某个 app 专属的交互编排
