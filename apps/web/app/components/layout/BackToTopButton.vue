@@ -10,7 +10,7 @@
     <button
       v-if="isBackTopVisible"
       type="button"
-      class="border-soft-border bg-background/92 text-muted-foreground hover:bg-primary-soft hover:text-foreground focus-visible:ring-accent fixed right-4 bottom-[7.5rem] z-40 flex size-10 cursor-pointer items-center justify-center rounded-full border shadow-[0_6px_18px_rgba(15,23,42,0.06)] backdrop-blur transition-colors focus-visible:ring-2 focus-visible:outline-none md:right-6 md:bottom-[8.5rem]"
+      class="border-soft-border bg-background/92 text-muted-foreground hover:bg-primary-soft hover:text-foreground focus-visible:ring-accent fixed right-4 bottom-6 z-40 flex size-10 cursor-pointer items-center justify-center rounded-full border shadow-[0_6px_18px_rgba(15,23,42,0.06)] backdrop-blur transition-colors focus-visible:ring-2 focus-visible:outline-none md:right-6 md:bottom-8"
       aria-label="回到顶部"
       @click="scrollToTop"
     >

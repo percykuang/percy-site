@@ -5,7 +5,6 @@ type ScrollContainerTarget = Ref<HTMLElement | null> | ShallowRef<HTMLElement | 
 const scrollContainer = shallowRef<HTMLElement | null>(null)
 const isBackTopVisible = ref(false)
 
-const bottomOffsetThreshold = 200
 const minimumScrollDistance = 240
 
 function syncBackTopVisibility() {
@@ -21,10 +20,8 @@ function syncBackTopVisibility() {
   const scrollTop = container.scrollTop
   const isScrollable = scrollHeight > viewportHeight + 1
   const hasScrolledEnough = scrollTop > minimumScrollDistance
-  const distanceToBottom = scrollHeight - viewportHeight - scrollTop
 
-  isBackTopVisible.value =
-    isScrollable && hasScrolledEnough && distanceToBottom <= bottomOffsetThreshold
+  isBackTopVisible.value = isScrollable && hasScrolledEnough
 }
 
 function handleScroll() {
