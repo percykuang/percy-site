@@ -1,7 +1,7 @@
 <template>
-  <div class="text-foreground flex min-h-screen flex-col">
+  <div class="text-foreground flex h-screen flex-col overflow-hidden">
     <SiteHeader />
-    <main class="flex-1">
+    <main ref="mainScrollRef" class="min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
       <NuxtPage />
     </main>
     <BackToTopButton />
@@ -19,5 +19,9 @@ import { ImageLightbox } from '@ps/ui'
 import BackToTopButton from './components/layout/BackToTopButton.vue'
 import SiteHeader from './components/layout/SiteHeader.vue'
 
+const mainScrollRef = ref<HTMLElement | null>(null)
+const { registerScrollContainer } = useWebScroll()
 const { closeMarkdownImageViewer, markdownImageViewer } = useMarkdownImageViewer()
+
+registerScrollContainer(mainScrollRef)
 </script>
