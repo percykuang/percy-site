@@ -1,5 +1,5 @@
 <template>
-  <article class="mx-auto max-w-3xl px-4 py-8 sm:px-6 md:py-10">
+  <article class="mx-auto max-w-3xl px-4 pt-8 pb-16 sm:px-6 md:pt-10 md:pb-20">
     <div v-if="article">
       <div class="min-w-0">
         <header class="border-soft-border border-b pb-6">
